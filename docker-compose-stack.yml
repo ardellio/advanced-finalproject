@@ -1,0 +1,101 @@
+version: '3.1'
+
+services:
+
+  web:
+    build:
+        context: ./web
+        dockerfile: Dockerfile
+    image: finalproject-web
+    networks:
+      - int_net
+      - proxy_net
+    volumes: 
+      - v_web : /var/www/html
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: always
+
+  db:
+    build:
+        context: ./mysql
+        dockerfile: Dockerfile
+    image: finalproject-mysql
+    environment:
+      # MYSQL_ROOT_PASSWORD: my_secret_password
+      MYSQL_RANDOM_ROOT_PASSWORD: YES 
+      MYSQL_DATABASE: dbkuasai
+      MYSQL_USER: cilsykuasaiuser
+      MYSQL_PASSWORD: cilsykuasaipassword
+      PMA_HOST: mysql
+    networks:
+      - int_net
+    volumes:
+      - ./database: /docker-entrypoint-initdb.d
+      - v_db: /var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: always
+
+  pma:
+    depends_on: db
+    build:
+        context: ./pma
+        dockerfile: Dockerfile
+    image: finalproject-pma
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    networks:
+      - int_net
+      - proxy_net
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: always
+  
+  proxy:
+    build:
+        context: ./proxy
+        dockerfile: Dockerfile
+    image: finalproject-proxy
+    links:
+      - pma
+      - web
+    ports:
+      - 80:80
+    networks:
+      - ext_net
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: always
+
+
+networks:
+  ext_net:
+  proxy_net:
+  int_net:
+
+volumes:
+  v_web:
+  v_db:
+
+secrets:
+  psql_pass:
+    file: ./psql_pass.txt
