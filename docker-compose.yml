@@ -4,23 +4,23 @@ services:
 
   web:
     build:
-        context: ./web
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: Dockerfile-web
     image: finalproject-web
     networks:
       - int_net
       - proxy_net
     volumes: 
-      - v_web : /var/www/html
+      - v_web:/var/www/html
 
-  db:
+  mysql:
     build:
-        context: ./mysql
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: Dockerfile-mysql
     image: finalproject-mysql
     environment:
       # MYSQL_ROOT_PASSWORD: my_secret_password
-      MYSQL_RANDOM_ROOT_PASSWORD: YES 
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
       MYSQL_DATABASE: dbkuasai
       MYSQL_USER: cilsykuasaiuser
       MYSQL_PASSWORD: cilsykuasaipassword
@@ -28,14 +28,13 @@ services:
     networks:
       - int_net
     volumes:
-      - ./database: /docker-entrypoint-initdb.d
-      - v_db: /var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+      - v_db:/var/lib/mysql
 
   pma:
-    depends_on: db
     build:
-        context: ./pma
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: Dockerfile-pma
     image: finalproject-pma
     environment:
       PMA_HOST: db
@@ -47,16 +46,14 @@ services:
   
   proxy:
     build:
-        context: ./proxy
-        dockerfile: Dockerfile
+        context: .
+        dockerfile: Dockerfile-proxy
     image: finalproject-proxy
-    links:
-      - pma
-      - web
     ports:
       - 80:80
     networks:
       - ext_net
+      - proxy_net
 
 
 networks:
