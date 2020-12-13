@@ -5,7 +5,7 @@ services:
   web:
     build:
         context: .
-        dockerfile: Dockerfile-eb
+        dockerfile: Dockerfile-web
     image: finalproject-web
     networks:
       - int_net
