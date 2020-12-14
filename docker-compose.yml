@@ -64,7 +64,3 @@ networks:
 volumes:
   v_web:
   v_db:
-
-secrets:
-  psql_pass:
-    file: ./psql_pass.txt

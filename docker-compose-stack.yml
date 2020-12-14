@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   web:
-    image: finalproject-web
+    image: ardellio/finalproject-web
     networks:
       - int_net
       - proxy_net
@@ -18,7 +18,7 @@ services:
         condition: on-failure
 
   mysql:
-    image: finalproject-mysql
+    image: ardellio/finalproject-mysql
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1 
       MYSQL_DATABASE: dbkuasai
@@ -39,7 +39,7 @@ services:
         condition: on-failure
 
   pma:
-    image: finalproject-pma
+    image: ardellio/finalproject-pma
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
@@ -56,7 +56,7 @@ services:
         condition: on-failure
   
   proxy:
-    image: finalproject-proxy
+    image: ardellio/finalproject-proxy
     links:
       - pma
       - web
