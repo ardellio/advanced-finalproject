@@ -57,9 +57,6 @@ services:
   
   proxy:
     image: ardellio/finalproject-proxy
-    links:
-      - pma
-      - web
     ports:
       - 80:80
     networks:
